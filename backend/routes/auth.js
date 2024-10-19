@@ -1,6 +1,7 @@
 import express from "express";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -31,4 +32,32 @@ router.post("/register", async (req, res) => {
   }
 });
 
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not exists" });
+    }
+    const checkpassword = await bcrypt.compare(password, user.password);
+    if (!checkpassword) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Wrong Credentials" });
+    }
+    const token = jwt.sign({ id: user._id }, "qwerty1234567890@#", {
+      expiresIn: "5h",
+    });
+    return res.status(200).json({
+      success: true,
+      token,
+      user: { name: user.name },
+      message: "Login Successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error in Login" });
+  }
+});
 export default router;

@@ -16,7 +16,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/api/auth", authRouter);
 
-app.listen(5001, () => {
+app.listen(5002, () => {
   connectToMongoDB();
   console.log("Server is running");
 });
