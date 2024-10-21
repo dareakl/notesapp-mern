@@ -3,6 +3,7 @@ import cors from "cors";
 import connectToMongoDB from "./db/db.js";
 
 import authRouter from "./routes/auth.js";
+import noteRouter from "./routes/note.js";
 
 const app = express();
 // Set up CORS to allow requests from your frontend
@@ -15,6 +16,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/api/auth", authRouter);
+app.use("/api/note", noteRouter);
 
 app.listen(5002, () => {
   connectToMongoDB();
