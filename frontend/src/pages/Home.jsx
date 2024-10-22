@@ -6,12 +6,24 @@ import NoteCard from "../components/NoteCard";
 
 const Home = () => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [filteredNotes, setFilteredNote] = useState([]); // Change initial state to []
   const [notes, setNotes] = useState([]);
   const [currentNote, setCurrentNote] = useState(null);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     fetchNote();
   }, []);
+
+  useEffect(() => {
+    setFilteredNote(
+      notes.filter(
+        (note) =>
+          note.title.toLowerCase().includes(query.toLowerCase()) ||
+          note.description.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+  }, [query, notes]);
 
   const fetchNote = async () => {
     try {
@@ -30,6 +42,7 @@ const Home = () => {
     setCurrentNote(note);
     setModalOpen(true);
   };
+
   const addNote = async (title, description) => {
     try {
       const response = await axios.post(
@@ -54,7 +67,6 @@ const Home = () => {
     try {
       const response = await axios.delete(
         `http://localhost:5002/api/note/${id}`,
-
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -68,6 +80,7 @@ const Home = () => {
       console.log(error);
     }
   };
+
   const editNote = async (id, title, description) => {
     try {
       const response = await axios.put(
@@ -90,16 +103,20 @@ const Home = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <Navbar />
+      <Navbar setQuery={setQuery} />
       <div className="px-8 pt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-        {notes.map((note) => (
-          <NoteCard
-            key={note.id}
-            note={note}
-            onEdit={onEdit}
-            deleteNote={deleteNote}
-          />
-        ))}
+        {filteredNotes.length > 0 ? (
+          filteredNotes.map((note) => (
+            <NoteCard
+              key={note.id}
+              note={note}
+              onEdit={onEdit}
+              deleteNote={deleteNote}
+            />
+          ))
+        ) : (
+          <p>No notes</p>
+        )}
       </div>
       <button
         onClick={() => setModalOpen(true)}
