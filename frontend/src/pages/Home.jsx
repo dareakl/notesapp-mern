@@ -3,10 +3,12 @@ import Navbar from "../components/Navbar";
 import NoteModal from "../components/NoteModal";
 import axios from "axios";
 import NoteCard from "../components/NoteCard";
+import { ToastContainer, toast } from "react-toastify"; // Import toast components
+import "react-toastify/dist/ReactToastify.css"; // Import the toast styles
 
 const Home = () => {
   const [isModalOpen, setModalOpen] = useState(false);
-  const [filteredNotes, setFilteredNote] = useState([]); // Change initial state to []
+  const [filteredNotes, setFilteredNote] = useState([]);
   const [notes, setNotes] = useState([]);
   const [currentNote, setCurrentNote] = useState(null);
   const [query, setQuery] = useState("");
@@ -27,7 +29,11 @@ const Home = () => {
 
   const fetchNote = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5002/api/note");
+      const { data } = await axios.get("http://localhost:5002/api/note", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       setNotes(data.notes);
     } catch (error) {
       console.log(error);
@@ -74,10 +80,12 @@ const Home = () => {
         }
       );
       if (response.data.success) {
+        toast.success("Note deleted successfully!"); // Show toast message
         fetchNote();
       }
     } catch (error) {
       console.log(error);
+      toast.error("Failed to delete note!"); // Show error toast message
     }
   };
 
@@ -132,6 +140,7 @@ const Home = () => {
           editNote={editNote}
         />
       )}
+      <ToastContainer /> {/* Add the ToastContainer here */}
     </div>
   );
 };
