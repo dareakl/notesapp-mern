@@ -50,6 +50,24 @@ const Home = () => {
     }
   };
 
+  const deleteNote = async (id) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:5002/api/note/${id}`,
+
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        fetchNote();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const editNote = async (id, title, description) => {
     try {
       const response = await axios.put(
@@ -75,7 +93,12 @@ const Home = () => {
       <Navbar />
       <div className="px-8 pt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
         {notes.map((note) => (
-          <NoteCard key={note.id} note={note} onEdit={onEdit} />
+          <NoteCard
+            key={note.id}
+            note={note}
+            onEdit={onEdit}
+            deleteNote={deleteNote}
+          />
         ))}
       </div>
       <button

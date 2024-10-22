@@ -1,7 +1,7 @@
 import React from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-const NoteCard = ({ note, onEdit }) => {
+const NoteCard = ({ note, onEdit, deleteNote }) => {
   return (
     <div className="bg-white p-4 rounded shadow">
       <h2 className="text-xl font-bold">{note.title}</h2>
@@ -10,7 +10,7 @@ const NoteCard = ({ note, onEdit }) => {
         <button className="text-blue-500 mr-2" onClick={() => onEdit(note)}>
           <FaEdit />
         </button>
-        <button className="text-red-500">
+        <button className="text-red-500" onClick={() => deleteNote(note._id)}>
           <FaTrash />
         </button>
       </div>
