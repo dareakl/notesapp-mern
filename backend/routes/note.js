@@ -35,4 +35,16 @@ router.get("/", async (req, res) => {
       .json({ success: false, message: "Can't retrive notes" });
   }
 });
+
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateNote = await Note.findByIdAndUpdate(id, req.body);
+    return res.status(200).json({ success: true, updateNote });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Can't update notes" });
+  }
+});
 export default router;

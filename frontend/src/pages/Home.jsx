@@ -7,23 +7,29 @@ import NoteCard from "../components/NoteCard";
 const Home = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [notes, setNotes] = useState([]);
+  const [currentNote, setCurrentNote] = useState(null);
 
   useEffect(() => {
-    const fetchNote = async () => {
-      try {
-        const { data } = await axios.get("http://localhost:5002/api/note");
-        setNotes(data.notes);
-      } catch (error) {
-        console.log(error);
-      }
-    };
     fetchNote();
   }, []);
+
+  const fetchNote = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:5002/api/note");
+      setNotes(data.notes);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const closeModal = () => {
     setModalOpen(false);
   };
 
+  const onEdit = (note) => {
+    setCurrentNote(note);
+    setModalOpen(true);
+  };
   const addNote = async (title, description) => {
     try {
       const response = await axios.post(
@@ -36,6 +42,27 @@ const Home = () => {
         }
       );
       if (response.data.success) {
+        fetchNote();
+        closeModal();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const editNote = async (id, title, description) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5002/api/note/${id}`,
+        { title, description },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        fetchNote();
         closeModal();
       }
     } catch (error) {
@@ -46,9 +73,9 @@ const Home = () => {
   return (
     <div className="bg-gray-100 min-h-screen">
       <Navbar />
-      <div>
+      <div className="px-8 pt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
         {notes.map((note) => (
-          <NoteCard key={note.id} note={note} />
+          <NoteCard key={note.id} note={note} onEdit={onEdit} />
         ))}
       </div>
       <button
@@ -57,7 +84,14 @@ const Home = () => {
       >
         +
       </button>
-      {isModalOpen && <NoteModal closeModal={closeModal} addNote={addNote} />}
+      {isModalOpen && (
+        <NoteModal
+          closeModal={closeModal}
+          addNote={addNote}
+          currentNote={currentNote}
+          editNote={editNote}
+        />
+      )}
     </div>
   );
 };
